@@ -1,0 +1,82 @@
+<!DOCTYPE>
+<html lang="en">
+
+<head>
+    <title>Men's Grand Slams</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+     <script src="./data/cloud.js"></script>
+    <style> svg{
+            margin-left: 270px;
+        }
+        h1{
+            text-align: center;
+        }
+    </style>
+    
+    </head>
+
+<body>
+    <div class="container">
+            <nav class="navbar navbar-dark bg-dark">
+        <a class="navbar-brand" href="home.html">Tennis Grand Slam Titles</a>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="home.html">Bar Graph</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" href="geomap.html">Map Projection</a>
+                </li>
+                
+                   <li class="nav-item">
+                    <a class="nav-link" href="wordcloud.html">Word Cloud</a>
+                </li>
+            </ul>
+    </nav>
+        <svg style="height: 500px;width:1000px;"></svg>
+        <div class="tooltip"></div>
+    </div>
+    
+    <script>
+         d3.csv("./data/tennis.csv", dataViz);
+      
+       function dataViz(data) {
+    	  
+        var wordScale=d3.scaleLinear().domain([0,175]).range([10,160]);
+       
+           
+           
+           
+        var keywords = ["Roger Federer","Rafeal Nadal","Novok Djokovic"];
+        
+        d3.cloud()
+          .size([500, 500])
+          .words(data)
+          .rotate(d => d.text.length > 5 ? 0 : 90)
+          .fontSize(d => wordScale(d.wins*2))
+          .on("end", draw)
+          .start();
+        
+        function draw(words) {
+          var wordG = d3.select("svg").append("g")
+              .attr("id", "wordCloudG").attr("transform","translate(250,250)");
+          wordG.selectAll("text")
+            .data(words)
+            .enter()
+            .append("text")
+              .style("font-size", d => d.size + "px")
+              .style("fill", d => keywords.indexOf(d.text) > -1 ? "#FE9922" : "#4F442B")
+              .attr("text-anchor", "middle")
+              .attr("transform", d => `translate(${[d.x, d.y]}) rotate(${d.rotate})`)
+              .text(d => d.text);
+        }
+      }
+        
+    </script>
+    </body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE>
+<html lang="en">
+
+<head>
+     <title>Men's Grand Slams</title>
+    <meta>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <style>
+        text{
+            text-align: center;
+            
+            
+        }
+        svg{
+            margin-left: 300px;
+        }
+        .right{
+            margin-left: 250px;
+            
+        }
+        li{
+          display: inline;
+        }
+    </style>
+  
+    </head>
+
+<body>
+    <div class="container">
+        <nav class="navbar navbar-dark bg-dark">
+        <a class="navbar-brand" href="home.html">Tennis Grand Slam Titles</a>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="home.html">Bar Graph</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" href="geomap.html">Map Projection</a>
+                </li>
+                
+                   <li class="nav-item">
+                    <a class="nav-link" href="wordcloud.html">Word Cloud</a>
+                </li>
+            </ul>
+    </nav>
+        <h1>List of Grand Slam men's singles champions</h1>
+   <div id="viz">
+      <svg style="width:700px;height:500px;" ></svg>
+       <div>
+	  <text class="right"></text>
+         <text class="bottom"></text>
+       <text class="top"></text>
+       <text class="left"></text>
+           </div>
+    </div>
+       <script>
+
+      d3.csv("./data/titles.csv", data => dataViz(data));     
+           
+
+      
+      function dataViz(incomingData) {
+
+        var maxtitles = d3.max(incomingData, d => parseInt(d.trophys));
+        var yScale = d3 .scaleLinear()
+                        .domain([0,maxtitles])
+                        .range([0,460]);
+          var x = d3.scaleBand()
+            .rangeRound([0, 600])
+            .padding(0.1);
+
+        var y = d3.scaleLinear()
+            .range([500, 0]);
+
+        var xAxis = d3.axisBottom(x)
+        
+        
+
+        var yAxis = d3.axisLeft(y)
+        x.domain(incomingData.map(function(d) { return d.player; }));
+        y.domain([0, d3.max(incomingData, function(d) { return parseInt(d.trophys); })]);
+          
+          
+
+          
+        d3  .select("svg")
+            .append("g")
+            .attr("transform", "translate(" + 40 + "," + 0 + ")")
+            .selectAll("rect")
+            .data(incomingData)
+            .enter()
+            .append("rect")
+            .attr("width", x.bandwidth()) 
+            .attr("height", d => yScale(parseInt(d.trophys)))
+            .attr("x", function(d) { return x(d.player); })
+            .attr("y", d => 480 - yScale(parseInt(d.trophys)))
+
+           .on("click", click)
+           .on("mouseover",barhover)
+                .on("mouseout",barhoverout);
+          
+          d3.select("svg")
+            .append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(30," + 480 + ")")
+            .call(xAxis);
+          
+          d3.select("svg")
+            .append("g")
+            .attr("transform", "translate(30," + 30 + ")")
+            .call(yAxis);
+          
+      };
+           
+           
+            
+          function click(d)
+               { 
+                   d3.selectAll("text.right").text(d.australian);
+                   d3.selectAll("text.bottom").text(d.french);
+                   d3.selectAll("text.top").text(d.wimbledon);
+                   d3.selectAll("text.left").text(d.us);
+               };
+                       function barhover(d){
+                  d3.select(this).style("fill","grey");
+                
+              
+            }
+            function barhoverout(d){
+                d3.select(this).style("fill","black"); 
+                
+             }
+        
+        </script>
+    </div>
+    </body>
+</html>
